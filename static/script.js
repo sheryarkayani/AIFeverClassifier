@@ -4,98 +4,108 @@ document.getElementById('diagnosisForm').addEventListener('submit', async functi
     const btn = document.getElementById('submitBtn');
     const resultCard = document.getElementById('resultCard');
 
-    // Set loading state
-    const originalBtnText = btn.innerHTML;
-    btn.innerHTML = '<span><span class="spinner"></span> Analyzing Vitals...</span>';
-    btn.style.opacity = '0.8';
+    // UI Loading state
+    const originalText = btn.innerHTML;
+    btn.innerHTML = 'Analyzing...';
     btn.disabled = true;
-
-    // Hide previous results slightly
-    if (!resultCard.classList.contains('hidden')) {
-        resultCard.style.opacity = '0.5';
-    }
+    resultCard.classList.add('hidden');
 
     try {
-        // Collect and parse data
+        // Collect Data
+        // Features: 
+        // 'Age', 'Sex', 'temperature', 'wbc', 'platelets', 
+        // 'headache', 'joint_pain', 'rash', 'vomiting', 'fatigue', 'chills',
+        // 'fever_pattern', 'travel_to_hot_area', 'mosquito_exposure', 
+        // 'sun_exposure', 'hygiene_issue'
+
+        const getCheck = (id) => document.getElementById(id).checked ? 1 : 0;
+        const getVal = (id) => document.getElementById(id).value;
+        const getNum = (id) => parseFloat(getVal(id)) || 0;
+
         const data = {
-            Age: parseInt(document.getElementById('age').value) || 0,
-            Sex: parseInt(document.getElementById('sex').value),
-            temperature: parseFloat(document.getElementById('temperature').value) || 0,
-            wbc: parseFloat(document.getElementById('wbc').value) || 0,
-            platelets: parseFloat(document.getElementById('platelets').value) || 0,
-            headache: parseInt(document.getElementById('headache').value),
-            joint_pain: parseInt(document.getElementById('joint_pain').value),
-            rash: parseInt(document.getElementById('rash').value),
-            travel_to_hot_area: parseInt(document.getElementById('travel').value),
-            mosquito_exposure: parseInt(document.getElementById('mosquito').value)
+            // Demographics (Hidden/Defaulted in UI for now, preserving inputs)
+            Age: parseInt(getVal('age')) || 30,
+            Sex: parseInt(getVal('sex')) || 1,
+
+            // Vitals
+            temperature: getNum('temperature'),
+            wbc: getVal('wbc') ? getNum('wbc') : null, // Optional
+            platelets: getVal('platelets') ? getNum('platelets') : null, // Optional
+
+            // Symptoms
+            headache: getCheck('headache'),
+            joint_pain: getCheck('joint_pain'),
+            rash: getCheck('rash'),
+            vomiting: getCheck('vomiting'),
+            fatigue: getCheck('fatigue'),
+            chills: getCheck('chills'),
+
+            // Pattern
+            fever_pattern: parseInt(getVal('fever_pattern')),
+
+            // Exposure
+            travel_to_hot_area: getCheck('travel'),
+            mosquito_exposure: getCheck('mosquito'),
+            sun_exposure: getCheck('sun_exposure'),
+            hygiene_issue: getCheck('hygiene')
         };
 
-        // Artificial delay for UX (to show animation)
+        // Simulating processing delay
         await new Promise(r => setTimeout(r, 600));
 
         const response = await fetch('/predict', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data)
         });
 
-        if (!response.ok) {
-            throw new Error(`Server Error: ${response.statusText}`);
-        }
+        if (!response.ok) throw new Error(response.statusText);
 
         const result = await response.json();
 
-        // Update Prediction Display
-        const predictionEl = document.getElementById('predictionValue');
-        predictionEl.textContent = result.prediction.replace(/-/g, ' ');
+        // Render Results
 
-        // Populate Confidence Scores with Bars
+        // 1. Prediction
+        document.getElementById('predictionValue').textContent = result.prediction.replace(/-/g, ' ');
+
+        // 2. Severity Badge
+        const badge = document.getElementById('severityBadge');
+        badge.textContent = result.severity + " Severity";
+
+        // Color coding
+        if (result.severity === 'High') {
+            badge.style.backgroundColor = '#ef4444'; // Red
+            badge.style.color = 'white';
+        } else if (result.severity === 'Medium') {
+            badge.style.backgroundColor = '#f97316'; // Orange
+            badge.style.color = 'white';
+        } else {
+            badge.style.backgroundColor = '#10b981'; // Green
+            badge.style.color = 'white';
+        }
+
+        // 3. Advice
+        document.getElementById('adviceText').textContent = result.advice;
+
+        // 4. Probabilities
         const probList = document.getElementById('probList');
         probList.innerHTML = '';
+        Object.entries(result.probabilities)
+            .sort(([, a], [, b]) => b - a)
+            .forEach(([key, val]) => {
+                const div = document.createElement('div');
+                div.className = 'prob-row';
+                div.innerHTML = `<span>${key}</span><span>${(val * 100).toFixed(1)}%</span>`;
+                probList.appendChild(div);
+            });
 
-        // Sort: highest probability first
-        const sortedProbs = Object.entries(result.probabilities)
-            .sort(([, a], [, b]) => b - a);
-
-        sortedProbs.forEach(([disease, prob], index) => {
-            const percentage = (prob * 100).toFixed(1);
-            const isTop = index === 0;
-
-            const row = document.createElement('div');
-            row.className = 'prob-row';
-            if (isTop) row.style.background = 'rgba(255,255,255,0.1)';
-
-            row.innerHTML = `
-                <span class="prob-label" style="${isTop ? 'color:#4ade80' : ''}">${disease.replace(/-/g, ' ')}</span>
-                <div class="prob-bar-container">
-                    <div class="prob-bar" style="width: 0%; ${isTop ? 'background: #4ade80;' : ''}"></div>
-                </div>
-                <span class="prob-value">${percentage}%</span>
-            `;
-            probList.appendChild(row);
-
-            // Animate bar after append
-            setTimeout(() => {
-                row.querySelector('.prob-bar').style.width = `${percentage}%`;
-            }, 50);
-        });
-
-        // Show result
         resultCard.classList.remove('hidden');
-        resultCard.style.opacity = '1';
+        resultCard.scrollIntoView({ behavior: 'smooth' });
 
-        // Smooth scroll to result
-        resultCard.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-
-    } catch (error) {
-        console.error(error);
-        alert('Diagnosis failed: ' + error.message);
+    } catch (e) {
+        alert('Error: ' + e.message);
     } finally {
-        // Reset button
-        btn.innerHTML = originalBtnText;
+        btn.innerHTML = originalText;
         btn.disabled = false;
-        btn.style.opacity = '1';
     }
 });

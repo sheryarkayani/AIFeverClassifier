@@ -15,77 +15,123 @@
     <div class="container">
         <header>
             <h1>AI Fever Classifier</h1>
-            <p>Advanced Diagnostics Powered by Machine Learning</p>
+            <p>Comprehensive Diagnostics & Actionable Advice</p>
         </header>
 
         <main>
             <div class="card glass">
                 <form id="diagnosisForm">
-                    <div class="form-grid">
-                        <!-- Demographics -->
-                        <div class="input-group">
-                            <label for="age">Age</label>
-                            <input type="number" id="age" required min="1" max="120" placeholder="e.g. 30">
+                    <!-- Section A: Symptoms -->
+                    <div class="form-section">
+                        <h3>A. Symptoms</h3>
+                        <div class="checkbox-grid">
+                            <label class="checkbox-container">
+                                <input type="checkbox" id="headache">
+                                <span class="checkmark"></span>
+                                Headache
+                            </label>
+                            <label class="checkbox-container">
+                                <input type="checkbox" id="joint_pain">
+                                <span class="checkmark"></span>
+                                Joint/Muscle Pain
+                            </label>
+                            <label class="checkbox-container">
+                                <input type="checkbox" id="rash">
+                                <span class="checkmark"></span>
+                                Rash
+                            </label>
+                            <label class="checkbox-container">
+                                <input type="checkbox" id="vomiting">
+                                <span class="checkmark"></span>
+                                Vomiting/Nausea
+                            </label>
+                            <label class="checkbox-container">
+                                <input type="checkbox" id="fatigue">
+                                <span class="checkmark"></span>
+                                Fatigue/Weakness
+                            </label>
+                            <label class="checkbox-container">
+                                <input type="checkbox" id="chills">
+                                <span class="checkmark"></span>
+                                Chills/Sweats
+                            </label>
                         </div>
-                        <div class="input-group">
-                            <label for="sex">Sex</label>
-                            <select id="sex" required>
-                                <option value="1">Male</option>
-                                <option value="0">Female</option>
-                            </select>
-                        </div>
+                    </div>
 
-                        <!-- Vitals & Lab -->
-                        <div class="input-group">
-                            <label for="temperature">Temperature (°C)</label>
-                            <input type="number" id="temperature" required step="0.1" placeholder="e.g. 38.5">
+                    <!-- Section B: Fever Pattern -->
+                    <div class="form-section">
+                        <h3>B. Temperature & Pattern</h3>
+                        <div class="input-row">
+                            <div class="input-group">
+                                <label for="temperature">Current Temp (°C)</label>
+                                <input type="number" id="temperature" required step="0.1" placeholder="38.5">
+                            </div>
+                            <div class="input-group">
+                                <label for="fever_pattern">Fever Pattern</label>
+                                <select id="fever_pattern" required>
+                                    <option value="0">Constant</option>
+                                    <option value="1">Intermittent</option>
+                                    <option value="2">Spikes</option>
+                                </select>
+                            </div>
                         </div>
-                        <div class="input-group">
-                            <label for="wbc">White Blood Cells</label>
-                            <input type="number" id="wbc" required placeholder="e.g. 5000">
-                        </div>
-                        <div class="input-group">
-                            <label for="platelets">Platelets</label>
-                            <input type="number" id="platelets" required placeholder="e.g. 200000">
-                        </div>
+                    </div>
 
-                        <!-- Symptoms -->
-                        <div class="input-group">
-                            <label for="headache">Headache</label>
-                            <select id="headache" required>
-                                <option value="1">Yes</option>
-                                <option value="0">No</option>
-                            </select>
+                    <!-- Section C: Exposure -->
+                    <div class="form-section">
+                        <h3>C. Exposure & Environment</h3>
+                        <div class="checkbox-grid">
+                            <label class="checkbox-container">
+                                <input type="checkbox" id="travel">
+                                <span class="checkmark"></span>
+                                Travel to Warm Areas
+                            </label>
+                            <label class="checkbox-container">
+                                <input type="checkbox" id="mosquito">
+                                <span class="checkmark"></span>
+                                Mosquito Bites
+                            </label>
+                            <label class="checkbox-container">
+                                <input type="checkbox" id="sun_exposure">
+                                <span class="checkmark"></span>
+                                Excessive Sun
+                            </label>
+                            <label class="checkbox-container">
+                                <input type="checkbox" id="hygiene">
+                                <span class="checkmark"></span>
+                                Poor Food/Water Hygiene
+                            </label>
                         </div>
-                        <div class="input-group">
-                            <label for="joint_pain">Joint Pain</label>
-                            <select id="joint_pain" required>
-                                <option value="1">Yes</option>
-                                <option value="0">No</option>
-                            </select>
-                        </div>
-                        <div class="input-group">
-                            <label for="rash">Rash</label>
-                            <select id="rash" required>
-                                <option value="1">Yes</option>
-                                <option value="0">No</option>
-                            </select>
-                        </div>
+                    </div>
 
-                        <!-- History -->
-                        <div class="input-group">
-                            <label for="travel">Travel to Hot Area</label>
-                            <select id="travel" required>
-                                <option value="1">Yes</option>
-                                <option value="0">No</option>
-                            </select>
+                    <!-- Section D: Labs (Optional) -->
+                    <div class="form-section">
+                        <h3>D. Labs / Vitals (Optional)</h3>
+                        <div class="input-row">
+                            <div class="input-group">
+                                <label for="platelets">Platelets</label>
+                                <input type="number" id="platelets" placeholder="e.g. 200000">
+                            </div>
+                            <div class="input-group">
+                                <label for="wbc">WBC Count</label>
+                                <input type="number" id="wbc" placeholder="e.g. 6000">
+                            </div>
                         </div>
-                        <div class="input-group">
-                            <label for="mosquito">Mosquito Exposure</label>
-                            <select id="mosquito" required>
-                                <option value="1">Yes</option>
-                                <option value="0">No</option>
-                            </select>
+                        <div class="input-group" style="margin-top:1rem;">
+                            <!-- Basic Demographics hidden/defaulted for now or added alongside -->
+                            <div class="input-row">
+                                <div class="input-group narrow">
+                                    <label for="age">Age</label>
+                                    <input type="number" id="age" value="30">
+                                </div>
+                                <div class="input-group narrow">
+                                    <label for="sex">Sex</label>
+                                    <select id="sex">
+                                        <option value="1">Male</option>
+                                        <option value="0">Female</option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -96,10 +142,19 @@
             </div>
 
             <div id="resultCard" class="card glass result hidden">
-                <h2>Diagnosis Result</h2>
-                <div class="prediction-box">
-                    <span id="predictionLabel">Prediction:</span>
+                <div class="result-header">
+                    <h2>Diagnosis Results</h2>
+                    <div id="severityBadge" class="severity-badge"></div>
+                </div>
+
+                <div class="prediction-main">
+                    <span class="label">Likely Condition</span>
                     <strong id="predictionValue" class="highlight">---</strong>
+                </div>
+
+                <div class="advice-box">
+                    <h3>Suggested Actions</h3>
+                    <p id="adviceText">---</p>
                 </div>
 
                 <div class="probabilities">
