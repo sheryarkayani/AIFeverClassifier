@@ -1,7 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from typing import Optional, Dict
 import sys
 import os
@@ -23,26 +23,27 @@ app.add_middleware(
 )
 
 class PatientData(BaseModel):
-    Age: int
-    Sex: int # 1 for Male, 0 for Female
-    temperature: float
-    # Symptoms
-    headache: int
-    joint_pain: int
-    rash: int
-    vomiting: int
-    fatigue: int
-    chills: int
-    fever_pattern: int # 0=Constant, 1=Intermittent, 2=Spikes
-    # Exposure
-    travel_to_hot_area: int
-    mosquito_exposure: int
-    sun_exposure: int
-    hygiene_issue: int
-    # Labs (Optional)
-    wbc: Optional[float] = None
-    platelets: Optional[float] = None
-    haemoglobin: Optional[float] = None
+    Age: int = Field(..., ge=0, le=120)
+    Sex: int = Field(..., ge=0, le=1)
+    temperature: float = Field(..., ge=30, le=45)
+
+    headache: int = Field(..., ge=0, le=1)
+    joint_pain: int = Field(..., ge=0, le=1)
+    rash: int = Field(..., ge=0, le=1)
+    vomiting: int = Field(..., ge=0, le=1)
+    fatigue: int = Field(..., ge=0, le=1)
+    chills: int = Field(..., ge=0, le=1)
+
+    fever_pattern: int = Field(..., ge=0, le=2)
+
+    travel_to_hot_area: int = Field(..., ge=0, le=1)
+    mosquito_exposure: int = Field(..., ge=0, le=1)
+    sun_exposure: int = Field(..., ge=0, le=1)
+    hygiene_issue: int = Field(..., ge=0, le=1)
+
+    wbc: Optional[float] = Field(None, ge=0)
+    platelets: Optional[float] = Field(None, ge=0)
+    haemoglobin: Optional[float] = Field(None, ge=0)
 
 def calculate_severity(prediction: str, data: dict) -> str:
     """
